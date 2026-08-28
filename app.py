@@ -45,7 +45,12 @@ MUTED = "#6b7a99"       # 補足文の色(グレー寄りの青)
 # グラフの系列に順番に使われる色の並び
 PALETTE = [BLUE, GOLD, BLUE_LIGHT, "#4d7fe0", "#96a8c8", "#2f4f8f"]
 
-DATA_DIR = Path("data")
+# --- データの置き場所 ---
+# 前に書いたほうが優先されます。
+#   data/        … 各 fetcher が取得したフル版(手元のパソコン用)
+#   data_public/ … GitHubに載せられる大きさに絞った軽量版(公開用)
+# 手元では data/ が、Streamlit Community Cloud では data_public/ が使われます。
+DATA_DIRS = [Path("data"), Path("data_public")]
 
 # --- 地図を描くための国コード対応表 ---
 # 地図(コロプレス地図)を描くには、国名ではなく「ISO3166-1 alpha-3」という
@@ -307,13 +312,19 @@ st.markdown(
 
 def find_latest_csv(folder: str, prefix: str) -> Path | None:
     """
-    data/<folder>/ の中から <prefix> で始まるCSVを探し、
+    <folder> の中から <prefix> で始まるCSVを探し、
     名前が一番後ろのもの(=日付が新しいもの)を返す。
     ファイル名に日付が入っているので、並べ替えの最後が最新になります。
+
+    探す場所は DATA_DIRS の順番です。
+    手元のパソコンでは data/(フル版)が、
+    Streamlit Community Cloud では data_public/(軽量版)が使われます。
     """
-    pattern = str(DATA_DIR / folder / f"{prefix}*.csv")
-    files = sorted(glob.glob(pattern))
-    return Path(files[-1]) if files else None
+    for base in DATA_DIRS:
+        files = sorted(glob.glob(str(base / folder / f"{prefix}*.csv")))
+        if files:
+            return Path(files[-1])
+    return None
 
 
 @st.cache_data(show_spinner="貿易データを読み込み中...")
