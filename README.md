@@ -37,6 +37,12 @@ python eu_news_fetcher_v2.py              # ニュース・動画
 
 取得したデータは `data/` に保存されます(約260MB。リポジトリには含めていません)。
 
+### 2. ダッシュボードを開く
+
+```bash
+streamlit run app.py
+```
+
 ### 3. 公開用の軽量データを作る (Streamlit Community Cloud に載せる場合)
 
 ```bash
@@ -46,12 +52,6 @@ python make_public_data.py
 `data/` から表示に必要な部分だけを取り出して `data_public/`(約33MB)を作ります。
 `app.py` は `data/` があればそちらを、なければ `data_public/` を読みます。
 手元ではフル版、クラウドでは軽量版が使われます。
-
-### 2. ダッシュボードを開く
-
-```bash
-streamlit run app.py
-```
 
 ## 毎日自動で更新する (Windows)
 
